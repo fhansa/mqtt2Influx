@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import argparse
 import paho.mqtt.client as mqtt
 from influxdb import InfluxDBClient
@@ -5,6 +6,7 @@ import json
 #import re
 import logging
 import sys
+import os
 import requests.exceptions
 
 
@@ -110,14 +112,15 @@ class influxStore:
 
 
 def main():
+    logger = logging.getLogger("mqtt2influx.main")
+
     parser = argparse.ArgumentParser(description='MQTT to InfluxDB parser')
     parser.add_argument('--mqtt-host', required=True, help='MQTT host')
     parser.add_argument('--mqtt-port', default="1883", help='MQTT port')
     parser.add_argument('--influx-host', required=True, help='InfluxDB host')
     parser.add_argument('--influx-port', default="8086", help='InfluxDB port')
     parser.add_argument('--influx-db', required=True, help='InfluxDB database')
-    parser.add_argument('--verbose', help='Enable verbose output to stdout',
-                        default=False, action='store_true')
+    parser.add_argument('--verbose', help='Enable verbose output to stdout', default=False, action='store_true')
     args = parser.parse_args()
 
     if args.verbose:
@@ -125,8 +128,12 @@ def main():
     else:
         logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-    with open('config.json') as json_data_file:
-        config = json.load(json_data_file)
+    try: 
+        dirname, filename = os.path.split(os.path.abspath(__file__))
+        with open(dirname + '/config.json') as json_data_file:
+            config = json.load(json_data_file)
+    except:
+        logger.exception("Cannot read config.json")
 
     influx=influxStore(args.influx_host, args.influx_port, "", "", args.influx_db)
     mqtt = MQTTSource(args.mqtt_host, args.mqtt_port, config, influx)
