@@ -113,13 +113,14 @@ class influxStore:
 
 def main():
     logger = logging.getLogger("mqtt2influx.main")
-
+    logger.info("STARTING MQTT2INFLUX")
     parser = argparse.ArgumentParser(description='MQTT to InfluxDB parser')
     parser.add_argument('--mqtt-host', required=True, help='MQTT host')
     parser.add_argument('--mqtt-port', default="1883", help='MQTT port')
     parser.add_argument('--influx-host', required=True, help='InfluxDB host')
     parser.add_argument('--influx-port', default="8086", help='InfluxDB port')
     parser.add_argument('--influx-db', required=True, help='InfluxDB database')
+    parser.add_argument('--sensor-config', required=True, help='Sensor config Json')
     parser.add_argument('--verbose', help='Enable verbose output to stdout', default=False, action='store_true')
     args = parser.parse_args()
 
@@ -129,8 +130,9 @@ def main():
         logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     try: 
-        dirname, filename = os.path.split(os.path.abspath(__file__))
-        with open(dirname + '/config.json') as json_data_file:
+        filename = args.sensor_config
+        logger.info("Reading config %s", filename)
+        with open(filename) as json_data_file:
             config = json.load(json_data_file)
     except:
         logger.exception("Cannot read config.json")
