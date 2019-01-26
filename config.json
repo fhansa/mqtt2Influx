@@ -1,0 +1,9 @@
+{
+    "sensors": [
+        {
+            "topic":"home/wordclock/temperature",
+            "measurement": "temperature",
+            "name":"wordclock_temp"
+        }
+    ]
+}
