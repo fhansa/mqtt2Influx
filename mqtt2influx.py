@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import argparse
 import paho.mqtt.client as mqtt
 from influxdb import InfluxDBClient
